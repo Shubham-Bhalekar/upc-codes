@@ -1,16 +1,23 @@
+// src/app.module.ts
+
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UpcController } from './upc/upc.controller';
 import { UpcService } from './upc/upc.service';
-import { UpcCode, UpcCodeSchema } from './schemas/upcCodesSchema';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { UpcCode, UpcCodeSchema } from './schemas/upcCodes.schema';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
+import { AuthController } from './auth/auth.controller';
+import { UsersController } from './users/users.controller';
+import { LocalStrategy } from './auth/local.strategy';
+import { JwtStrategy } from './auth/jwt.strategy';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true, // makes the module global, no need to import in other modules
+      isGlobal: true,
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
@@ -19,10 +26,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       }),
       inject: [ConfigService],
     }),
-    // MongooseModule.forRoot('mongodb://localhost:27017/upc_test_blank'),
     MongooseModule.forFeature([{ name: UpcCode.name, schema: UpcCodeSchema }]),
+    AuthModule,
+    UsersModule,
+    PassportModule
   ],
-  controllers: [AppController, UpcController],
-  providers: [AppService, UpcService],
+  controllers: [UpcController, AuthController, UsersController],
+  providers: [UpcService, LocalStrategy, JwtStrategy],
 })
 export class AppModule {}

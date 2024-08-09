@@ -1,9 +1,12 @@
 // src/upc.controller.ts
 
-import { Controller, Get, Param, Post, Body } from '@nestjs/common';
+import { Controller, Get, Param, Post, Body, UseGuards, Put } from '@nestjs/common';
 import { UpcService } from './upc.service';
 import { CreateProductDto } from '../dto/create-product.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { UpdateProductDto } from 'src/dto/update-product.dto';
 
+@UseGuards(JwtAuthGuard)
 @Controller('upc')
 export class UpcController {
   constructor(private readonly upcService: UpcService) {}
@@ -16,5 +19,10 @@ export class UpcController {
   @Post()
   async addProduct(@Body() createProductDto: CreateProductDto) {
     return this.upcService.addProduct(createProductDto);
+  }
+
+  @Put()
+  async updateProduct(@Body() updateProductDto: UpdateProductDto) {
+    return this.upcService.updateProduct(updateProductDto);
   }
 }
